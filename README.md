@@ -1,83 +1,140 @@
 <div align="center">
 
-# X-Ray Mirror
+# 🩻 X-Ray Mirror
 
-**See the anatomy beneath your reflection.**
+### Real-time browser AR anatomy mirror powered by Three.js & MediaPipe
 
-A browser-based, real-time AR anatomy visualization that overlays interactive 3D anatomy on your webcam feed—powered by Three.js and MediaPipe.
+Overlay a live, interactive **3D skull, brain, full-body skeleton, beating organs, muscles, and hand bones** onto your webcam feed — in a single self-contained HTML file.
 
-[Launch the demo](xray.html#demo) · [Run with your camera](#quick-start) · [Privacy & safety](#privacy--safety)
+<p>
+  <img src="https://img.shields.io/badge/Three.js-0.160.0-049EF4?style=for-the-badge&logo=threedotjs&logoColor=white" alt="Three.js 0.160.0" />
+  <img src="https://img.shields.io/badge/MediaPipe-0.10.14-0097A7?style=for-the-badge&logo=google&logoColor=white" alt="MediaPipe Tasks Vision 0.10.14" />
+  <img src="https://img.shields.io/badge/WebGL-Custom%20GLSL-7FD1FF?style=for-the-badge&logo=webgl&logoColor=black" alt="WebGL Custom GLSL" />
+  <img src="https://img.shields.io/badge/Privacy-100%25%20Local-57D98A?style=for-the-badge" alt="100% Local Processing" />
+</p>
+
+[Quick Start](#-quick-start) • [Features](#-features) • [Controls](#-controls--modes) • [Architecture](#-how-it-works) • [Demo Mode](#-demo-mode-no-camera)
 
 </div>
 
 ---
 
-## At a glance
+## ✨ Features
 
-| | |
-| --- | --- |
-| **Experience** | Real-time browser AR with face, body-pose, and hand tracking |
-| **Anatomy** | Skull, brain, skeleton, organs, muscles, and hand bones |
-| **Privacy** | Video is processed locally in your browser; frames are not uploaded |
-| **Format** | Self-contained `xray.html` application |
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>💀 Head & Facial Tracking</h3>
+      <ul>
+        <li>High-detail 3D cranium, cerebrum, hindbrain, eyeballs, and facial muscles.</li>
+        <li>Live jaw articulation driven by MediaPipe <code>jawOpen</code> blendshapes.</li>
+        <li>2D-to-3D projection auto-fit + manual calibration sliders persisted in <code>localStorage</code>.</li>
+        <li>Automatic pose-based head fallback when stepping far from the camera.</li>
+      </ul>
+    </td>
+    <td width="50%" valign="top">
+      <h3>🦴 Full-Body & Upper-Body Tracking</h3>
+      <ul>
+        <li><strong>Skeleton:</strong> 18-vertebra spine, 11-pair ribcage & sternum, clavicles, scapulae, pelvis, humeri, radius & ulna, femurs, patellae, tibia & fibula, and feet.</li>
+        <li><strong>Organs:</strong> beating heart, breathing lungs & trachea, liver, stomach, kidneys, and intestines.</li>
+        <li><strong>Desk-friendly:</strong> synthesizes a torso anchor when hips are out of frame.</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>🖐️ Dual Hand Bone Tracking</h3>
+      <ul>
+        <li>Simultaneously tracks up to two hands via <code>HandLandmarker</code>.</li>
+        <li>Renders 3D carpal/metacarpal palm and phalanx bone segments synced with your forearms.</li>
+        <li>Fingertip-tracked <strong>X-Ray Lens</strong> follows your index finger across the screen.</li>
+      </ul>
+    </td>
+    <td width="50%" valign="top">
+      <h3>🎨 Custom X-Ray & Solid Shaders</h3>
+      <ul>
+        <li><strong>X-Ray Mode:</strong> additive Fresnel rim-glow shader with edge feathering and neck fade.</li>
+        <li><strong>Solid Mode:</strong> depth-tested, lit 3D anatomical shading.</li>
+        <li><strong>Mixed Reality:</strong> blend your real camera image, slice along X/Y planes, or inspect via movable lens.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
 
-## Highlights
+---
 
-### Head and face
+## 🚀 Quick Start
 
-- FaceLandmarker tracking for a detailed 3D cranium, articulated jaw, cerebrum, hindbrain, eyeballs, facial muscles, and head outline.
-- Jaw movement follows the `jawOpen` blendshape.
-- Automatic 2D-to-3D alignment, with **Fit to my head** controls for size, width, height, depth, and X/Y/Z offset. Adjustments are saved in `localStorage`.
-- Pose-based head fallback when you move farther from the camera.
-
-### Body and anatomy
-
-- PoseLandmarker tracking drives an articulated skeleton, including the spine, ribcage, sternum, clavicles, scapulae, pelvis, and limb bones.
-- Visualizes internal organs including the heart, lungs, trachea and bronchi, liver, stomach, kidneys, and intestines.
-- Adds torso and limb muscle groups, a contoured body silhouette, and a dark veil.
-- Supports both a seated, desk-facing view and a full-body standing view. When hips are out of frame, a proportional torso anchor is synthesized.
-
-### Hands
-
-- HandLandmarker tracks up to two hands and displays 3D palm, carpal, and phalanx meshes.
-
-### Visualization controls
-
-- **Presets and layers:** Skull, Full skeleton, Organs, Brain, Muscles, and Everything, with individual layer toggles.
-- **Look modes:** glowing additive X-ray shading with a Fresnel rim glow, or lit Solid mode with brightness control.
-- **Mixed reality and cutaways:** blend the live camera feed through the anatomy, adjust edge feathering, or use Left, Right, Top, and Bottom slices. An X-ray lens follows your movement.
-- **Labels and telemetry:** show anatomical callouts, tracking landmarks, FPS, and pose statistics.
-
-## Quick start
-
-Webcam access and ES module loading require a secure context: `http://localhost` or `https://`. Start a local static server from the project directory:
+> **Zero build tools required.** Just serve `xray.html` over `localhost` (required by browsers for camera access and ES module imports).
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/<your-username>/xray-mirror.git
+cd xray-mirror
+
+# 2. Start a local static server
 python -m http.server 8000
 ```
 
-Open the app in **Chrome** or **Edge**:
+Open **Chrome** or **Edge** and visit:
 
-- **Live webcam:** <http://localhost:8000/xray.html>
-- **No-camera demo:** <http://localhost:8000/xray.html#demo>
+| Mode | URL | Description |
+| :--- | :--- | :--- |
+| **Live Mirror** | [`http://localhost:8000/xray.html`](http://localhost:8000/xray.html) | Click **Start camera** and allow webcam access |
+| **Demo Scene** | [`http://localhost:8000/xray.html#demo`](http://localhost:8000/xray.html#demo) | Instant full-body + head + hand preview with no camera |
 
-Optional URL flags: `?still` freezes the animation and `?dump` renders a flattened PNG preview.
+> **Note:** Internet access is needed on first load to fetch Three.js (`0.160.0`), `@mediapipe/tasks-vision` (`0.10.14`), and the MediaPipe `.task` models from CDN. All video processing stays strictly on your device.
 
-> **First-load requirement:** An internet connection is needed to fetch Three.js, MediaPipe Tasks Vision, and the MediaPipe landmark models from their CDNs. The app processes webcam frames in your browser; video frames are not uploaded.
+---
 
-## Technology
+## 🎛️ Controls & Modes
 
-- **3D rendering:** [Three.js](https://threejs.org/) 0.160.0, with custom GLSL shaders for X-ray, Solid, and Veil modes.
-- **Tracking:** [MediaPipe Tasks Vision](https://developers.google.com/mediapipe/solutions/vision/pose_landmarker) 0.10.14, using FaceLandmarker, PoseLandmarker, and HandLandmarker.
-- **Interface:** HTML5 Canvas for shading and HUD overlays.
-- **Packaging:** A single `xray.html` file with embedded quantized head and hand mesh buffers and procedurally generated full-body geometry.
+| Group | Options |
+| :--- | :--- |
+| **Presets** | `Skull` · `Full skeleton` · `Organs` · `Brain` · `Muscles` · `Everything` |
+| **Layers** | `Skull`, `Body bones`, `Brain`, `Organs`, `Muscles`, `Eyes`, `Body outline`, `Hand bones`, `Show labels` |
+| **Look** | `X-ray` (glowing rim shader) · `Solid` (lit 3D anatomy) · `Brightness` |
+| **Mixed Reality** | `Real me showing through` · `Edge feather` · `Reveal` (`Whole head`, `Left/Right half`, `Top/Lower`, `X-ray lens`) |
+| **Calibration & Debug** | `Fit to my head` (scale, W/H/D, X/Y/Z) · `Show tracking data` (landmarks, pose skeleton, FPS) |
 
-## Privacy & safety
+---
 
-Camera access is used for live tracking and visualization in your browser. Video frames are not uploaded to a server. External libraries and landmark models are downloaded from CDNs when the app loads; see the first-load requirement above.
+## 🧠 How It Works
 
-**For educational visualization only.** The anatomy is an adult reference model scaled and aligned to tracked pose. It is not a scan of your body and is not a medical tool.
+```mermaid
+flowchart LR
+    V["Webcam / Demo Frame"] --> F["FaceLandmarker (468 pts + Matrix)"]
+    V --> P["PoseLandmarker Lite (33 pts + World)"]
+    V --> H["HandLandmarker (2x 21 pts)"]
+    F --> HS["headScene (Perspective + BodyParts3D)"]
+    P --> BS["bodyScene (Ortho + Procedural 3D Anatomy)"]
+    P -. "Fallback at long range" .-> HS
+    H --> HND["handScene (Ortho + Hand Bones)"]
+    HS & BS & HND --> GL["WebGL Custom GLSL + 2D HUD Labels"]
+```
 
-## Attribution
+<details>
+<summary><strong>Under the hood: architecture details</strong></summary>
 
-Head and hand 3D models are from [BodyParts3D](https://lifesciencedb.jp/bp3d/), © The Database Center for Life Science, licensed under [CC Attribution-Share Alike 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/).
+- **Single-file delivery (`xray.html`):** Embeds quantized `Uint16` BodyParts3D head/hand mesh buffers (`#meshmeta` + `#meshdata`) alongside procedural `THREE.BufferGeometry` generators (`buildBodyGeos`) for the spine, ribcage, limbs, organs, and muscles.
+- **Layered compositor:** Stacks `<video>`, a 2D veil canvas (`#shade`), a transparent Three.js WebGL canvas (`#gl`), and a 2D HUD canvas (`#hud`) for collision-free anatomical callout labels and debug overlays.
+- **Hardware acceleration:** Attempts MediaPipe `GPU` delegate first and seamlessly falls back to `CPU` if WebGL delegates are unavailable.
+
+</details>
+
+---
+
+## 🧪 Demo Mode (No Camera)
+
+Test rendering, shaders, and layout directly without a webcam:
+
+- `xray.html#demo` — Animated standing full-body skeleton, head, and hand.
+- `xray.html#demo?still` — Pauses animation at a fixed frame.
+- `xray.html#demo?dump` — Flattens all canvas layers into a single PNG `<img>` overlay for visual inspection.
+
+---
+
+## ⚠️ Disclaimer & Credits
+
+- **Not a medical tool:** Anatomy is a generalized adult reference model aligned to your pose for education and visualization—it is not a scan of your body.
+- **3D Head & Hand Models:** [BodyParts3D](https://lifesciencedb.jp/bp3d/) © The Database Center for Life Science, licensed under [CC Attribution-Share Alike 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/) (models simplified and re-aligned).
